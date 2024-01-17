@@ -12,4 +12,5 @@ The individual R-source files are the following:
 - 'forecast-ex.R' sets up a grid for all required estimations, defines algorithm settings and was run in a parallel computing environment
 - 'utils.R' contains several helper functions
 
-Some auxiliary functions may have been copied from other respositories. These codes come without technical support or guarantees of any kind.
+Some auxiliary functions may have been copied from other respositories. This code comes without technical support of any kind. Please report any typos
+or errors to: mpfarrho@gmail.com. The code is free to use, provided that the paper is cited properly.
