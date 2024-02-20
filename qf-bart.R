@@ -443,35 +443,17 @@ qfbart <- function(Y,X,sl.X,X.out,train.start,
       if(!silent) setTxtProgressBar(pb, irep)
     }
     
-    message("\nSorting quantiles.")
-    # quantile sorting
-    pred.store.sort <- pred.store*NA
-    for(irep in 1:nsave){
-      tmp <- pred.store[irep,,]
-      if(any(is.na(tmp))){
-        pred.store.sort[irep,,] <- NA
-      }else{
-        pred.store.sort[irep,,] <- apply(tmp,2,sort)
-      }
-    }
-    quant.store.sort <- aperm(apply(quant.store,c(1,2,4),sort),c(2,3,1,4))
-    quant.store.sort <- NA
-    
-    # posteriors
     pe.quants <- apply(pred.store, c(2,3), quantmean.fun)
-    pe.quants.sort <- apply(pred.store.sort, c(2,3), quantmean.fun)
-    dimnames(pe.quants) <- dimnames(pe.quants.sort) <- list(c("low", "med", "high", "mean"),
-                                                            set.p,
-                                                            colnames(Y))
+    dimnames(pe.quants) <- list(c("low", "med", "high", "mean"),
+                                  set.p,
+                                  colnames(Y))
     
     quant.mean <- apply(quant.store, c(2,3,4), quantmean.fun) # insample estimate of the quantiles
-    quant.mean.sort <- apply(quant.store.sort, c(2,3,4), quantmean.fun) # insample estimate of the quantiles
-    dimnames(quant.mean) <- dimnames(quant.mean.sort) <- list(c("low","med","high","mean"),
-                                                              as.character(rownames(Y)),
-                                                              set.p,
-                                                              colnames(Y))
+    dimnames(quant.mean) <- list(c("low","med","high","mean"),
+                                  as.character(rownames(Y)),
+                                  set.p,
+                                  colnames(Y))
     
-    message("\nSummarizing posterior.")
     weights.quant <- apply(omega.store,c(2,3),quantmean.fun)
     beta.quant <- apply(beta.store, c(2,3,4), quantmean.fun)
     f.quant <- apply(f.store, c(2,3), quantmean.fun)
@@ -488,11 +470,9 @@ qfbart <- function(Y,X,sl.X,X.out,train.start,
                               set.p)
     
     ret.list <- list("weights"=weights.quant,        # weight on the non-parametric part
-                     "beta"=beta.quant,            # "linear" part of the coefficients
+                     "beta"=beta.quant,              # "linear" part of the coefficients
                      "quants"=quant.mean,            # insample fitted quantiles
-                     "quants.sort"=quant.mean.sort,  # insample fitted quantiles
                      "predq"=pe.quants,              # quantile estimates of quantile forecast
-                     "predq.sort"=pe.quants.sort,    # quantile estimates of quantile forecast (sorted)
                      "factors"=f.quant,              # latent factors wrt. cross-section
                      "loadings"=L.quant,             # loadings on the factors
                      "count"=count.quant            # splitting rule count
