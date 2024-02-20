@@ -9,10 +9,10 @@ qfbart <- function(Y,X,sl.X,X.out,train.start,
   
   # frequentist variant of the model
   if(mod == "AR-abg-fq"){
-    pe.quants <- pe.quants.sort <- array(NA,dim=c(4,length(set.p),ncol(Y)))
-    quant.mean <- quant.mean.sort <- array(NA,dim=c(4,length(set.p),T,ncol(Y)))
-    dimnames(pe.quants) <- dimnames(pe.quants.sort) <- list(c("low","med","high","mean"),set.p,colnames(Y))
-    dimnames(quant.mean) <- dimnames(quant.mean.sort) <- list(c("low","med","high","mean"),set.p,NULL,colnames(Y))
+    pe.quants <- array(NA,dim=c(4,length(set.p),ncol(Y)))
+    quant.mean <- array(NA,dim=c(4,length(set.p),T,ncol(Y)))
+    dimnames(pe.quants) <- list(c("low","med","high","mean"),set.p,colnames(Y))
+    dimnames(quant.mean) <- list(c("low","med","high","mean"),set.p,NULL,colnames(Y))
     for(i in 1:N){
       Y.i <- Y[,i]
       X.i <- X[,sl.X[i,],drop=F]
@@ -20,23 +20,13 @@ qfbart <- function(Y,X,sl.X,X.out,train.start,
       sim <- rq(Y.i~X.i-1,tau=set.p)
       
       for(mm in 1:4){
-        tmp.pe <- pe.quants[mm,,i] <- (apply(as.matrix(sim$coefficients)*X.out.i,2,sum) * Ysd[i]) + Ymu[i]
-        tmp.quant <- quant.mean[mm,,,i] <- (apply(sim$fitted.values,1,sort) * Ysd[i]) + Ymu[i]
-        
-        pe.quants.sort[mm,,i] <- sort(tmp.pe)
-        quant.mean.sort[mm,,,i] <- apply(tmp.quant,2,sort)
+        pe.quants[mm,,i] <- (apply(as.matrix(sim$coefficients)*X.out.i,2,sum) * Ysd[i]) + Ymu[i]
+        quant.mean[mm,,,i] <- (apply(sim$fitted.values,1,sort) * Ysd[i]) + Ymu[i]
       }
     }
     
-    ret.list <- list("weights"=NULL,        # weight on the non-parametric part
-                     # "beta"=beta.quant,            # "linear" part of the coefficients
-                     "quants"=quant.mean,            # insample fitted quantiles
-                     "quants.sort"=quant.mean.sort,  # insample fitted quantiles
-                     "predq"=pe.quants,              # quantile estimates of quantile forecast
-                     "predq.sort"=pe.quants.sort,    # quantile estimates of quantile forecast (sorted)
-                     "factors"=NULL,              # latent factors wrt. cross-section
-                     "loadings"=NULL,             # loadings on the factors
-                     "count"=NULL            # splitting rule count
+    ret.list <- list("quants"=quant.mean,            # insample fitted quantiles
+                     "predq"=pe.quants               # quantile estimates of quantile forecast
     )
   }
   
